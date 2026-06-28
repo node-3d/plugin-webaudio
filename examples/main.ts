@@ -1,14 +1,13 @@
-import { dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
 import * as three from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { init, addThreeHelpers } from '3d-core-raub';
-import { init as initWebaudio } from '3d-webaudio-raub';
+import { init, addThreeHelpers, Image, Screen } from '@node-3d/core';
+import { init as initWebaudio } from '@node-3d/plugin-webaudio';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const cwd = import.meta.dirname;
+
 
 const {
-	doc, Image: Img, gl, loop, Screen,
+	doc, loop,
 } = init({
 	isGles3: true,
 	isWebGL2: true,
@@ -16,12 +15,16 @@ const {
 	autoFullscreen: true,
 });
 
-addThreeHelpers(three, gl);
+addThreeHelpers(three);
 
 initWebaudio({ window: doc });
 
-const icon = new Img(__dirname + '/webaudio.png');
-icon.on('load', () => { doc.icon = (icon as unknown as typeof doc.icon); });
+const icon = new Image(`${cwd}/webaudio.png`);
+icon.on('load', () => {
+	if (icon.data) {
+		doc.icon = { width: icon.width, height: icon.height, data: icon.data };
+	}
+});
 doc.title = 'Web Audio';
 
 const SPHERE_RADIUS = 0.3;
@@ -45,10 +48,10 @@ const floorMaterial = new three.MeshToonMaterial({ color: 0xc78757 });
 
 const camera = new three.PerspectiveCamera(60, doc.w / doc.h, 0.5, 50);
 camera.position.set(0, 3, 7);
-const controls = new OrbitControls(camera, doc as unknown as HTMLElement);
+const controls = new OrbitControls(camera, doc as typeof doc & HTMLElement);
 controls.update();
 
-const screen = new Screen({ THREE: three, camera });
+const screen = new Screen({ three, camera });
 const scene = screen.scene;
 scene.background = new three.Color(0x8dcede);
 
@@ -120,36 +123,37 @@ for (let i = 0; i < count; i++) {
 	balls.push({ mesh, audio: null, down });
 }
 
-audioLoader.load(`${__dirname}/sounds/hit.wav`, (buffer: AudioBuffer) => {
-	balls.forEach((ball: TBall) => {
+audioLoader.load(`${cwd}/sounds/hit.wav`, (buffer: AudioBuffer) => {
+	for (const ball of balls) {
 		const audio = new three.PositionalAudio(listener);
 		audio.setBuffer(buffer);
 		ball.audio = audio;
 		ball.mesh.add(audio);
-	});
+	}
 });
 
 const animate = (time: number) => {
-	balls.forEach((ball: TBall, i: number) => {
+	for (let i = 0; i < balls.length; i++) {
+		const ball = balls[i];
 		const previousHeight = ball.mesh.position.y;
 		
 		const angle = i * offset + (time * speed);
 		ball.mesh.position.y = Math.abs(Math.sin(angle) * height);
 		
 		if (ball.mesh.position.y === previousHeight) {
-			return;
+			continue;
 		}
 		
 		if (ball.down && ball.mesh.position.y > previousHeight) {
 			ball.audio?.play();
 			ball.down = false;
-			return;
+			continue;
 		}
 		
 		if (!ball.down && ball.mesh.position.y < previousHeight) {
 			ball.down = true;
 		}
-	});
+	}
 	
 	controls.update();
 	screen.draw();
