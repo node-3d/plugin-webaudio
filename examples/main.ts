@@ -5,10 +5,7 @@ import { init as initWebaudio } from '@node-3d/plugin-webaudio';
 
 const cwd = import.meta.dirname;
 
-
-const {
-	doc, loop,
-} = init({
+const { doc, loop } = init({
 	isGles3: true,
 	isWebGL2: true,
 	autoEsc: true,
@@ -34,7 +31,6 @@ const radius = 6;
 const speed = 0.001;
 const height = 3;
 const offset = 0.5;
-
 
 const sphereGeometry = new three.IcosahedronGeometry(SPHERE_RADIUS, 5);
 const outlineGeometry = new three.IcosahedronGeometry(SPHERE_RADIUS + OUTLINE_SIZE, 5);
@@ -89,9 +85,9 @@ window.addEventListener('resize', () => {
 });
 
 type TBall = {
-	mesh: three.Mesh,
-	audio: three.PositionalAudio | null,
-	down: boolean,
+	mesh: three.Mesh;
+	audio: three.PositionalAudio | null;
+	down: boolean;
 };
 
 const balls: TBall[] = [];
@@ -104,22 +100,22 @@ for (let i = 0; i < count; i++) {
 	const outlineMesh = new three.Mesh(outlineGeometry, outlineMaterial);
 	mesh.add(outlineMesh);
 	mesh.castShadow = true;
-	
-	const spread = i / count * Math.PI * 2;
+
+	const spread = (i / count) * Math.PI * 2;
 	mesh.position.x = radius * Math.cos(spread);
 	mesh.position.z = radius * Math.sin(spread);
-	
+
 	let down = false;
-	const angle0 = i * offset + (time0 * speed);
+	const angle0 = i * offset + time0 * speed;
 	const previousHeight = Math.abs(Math.sin(angle0) * height);
-	const angle1 = i * offset + (time1 * speed);
+	const angle1 = i * offset + time1 * speed;
 	mesh.position.y = Math.abs(Math.sin(angle1) * height);
 	if (mesh.position.y < previousHeight) {
 		down = true;
 	}
-	
+
 	scene.add(mesh);
-	
+
 	balls.push({ mesh, audio: null, down });
 }
 
@@ -136,25 +132,25 @@ const animate = (time: number) => {
 	for (let i = 0; i < balls.length; i++) {
 		const ball = balls[i];
 		const previousHeight = ball.mesh.position.y;
-		
-		const angle = i * offset + (time * speed);
+
+		const angle = i * offset + time * speed;
 		ball.mesh.position.y = Math.abs(Math.sin(angle) * height);
-		
+
 		if (ball.mesh.position.y === previousHeight) {
 			continue;
 		}
-		
+
 		if (ball.down && ball.mesh.position.y > previousHeight) {
 			ball.audio?.play();
 			ball.down = false;
 			continue;
 		}
-		
+
 		if (!ball.down && ball.mesh.position.y < previousHeight) {
 			ball.down = true;
 		}
 	}
-	
+
 	controls.update();
 	screen.draw();
 };

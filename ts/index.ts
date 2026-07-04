@@ -4,14 +4,14 @@ import type { TInitOpts, TWebaudio3D } from './types.ts';
 const initPlugin = (opts: TInitOpts): TWebaudio3D => {
 	const { window } = opts;
 	const { AudioContext } = webaudio;
-	
+
 	window.AudioContext = AudioContext;
 	Object.defineProperty(globalThis, 'AudioContext', {
 		value: AudioContext,
 		configurable: true,
 		writable: true,
 	});
-	
+
 	return {
 		webaudio,
 	};
@@ -34,6 +34,12 @@ const init = (opts: TInitOpts): TWebaudio3D => {
 };
 
 export { init };
-export type { TAudioContext, TAudioGlobal, TAudioWindow, TInitOpts, TWebaudio, TWebaudio3D } from './types.ts';
-export default { init 
-};
+export type {
+	TAudioContext,
+	TAudioGlobal,
+	TAudioWindow,
+	TInitOpts,
+	TWebaudio,
+	TWebaudio3D,
+} from './types.ts';
+export default { init };

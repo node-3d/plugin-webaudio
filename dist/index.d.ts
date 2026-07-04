@@ -9,6 +9,6 @@ declare const init: (opts: TInitOpts) => TWebaudio3D;
 export { init };
 export type { TAudioContext, TAudioGlobal, TAudioWindow, TInitOpts, TWebaudio, TWebaudio3D } from './types.ts';
 declare const _default: {
-    init: (opts: TInitOpts) => TWebaudio3D;
+    init: typeof init;
 };
 export default _default;
