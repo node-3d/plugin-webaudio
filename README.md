@@ -1,4 +1,4 @@
-# Node.js 3D WebAudio
+# Node3D WebAudio Extension
 
 This is a part of [Node3D](https://github.com/node-3d) project.
 

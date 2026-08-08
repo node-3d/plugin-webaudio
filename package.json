@@ -2,7 +2,7 @@
 	"author": "Luis Blanco <luisblanco1337@gmail.com>",
 	"name": "@node-3d/plugin-webaudio",
 	"version": "4.0.0",
-	"description": "WebAudio plugin for Node.js 3D Core",
+	"description": "WebAudio plugin for Node3D",
 	"license": "MIT",
 	"main": "dist/index.js",
 	"keywords": [
