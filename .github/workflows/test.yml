@@ -1,4 +1,7 @@
 name: Test
+defaults:
+  run:
+    shell: bash
 
 on:
   push:
@@ -9,10 +12,30 @@ on:
       - master
 
 jobs:
-  Test:
+  unit-tests:
+    name: Unit Tests (${{ matrix.target }})
     strategy:
-        matrix:
-          os: [ubuntu-latest]
+      fail-fast: false
+      matrix:
+        include:
+          - target: windows-x64
+            os: windows-2022
+            node_arch: x64
+          - target: windows-arm64
+            os: windows-11-arm
+            node_arch: arm64
+          - target: linux-x64
+            os: ubuntu-22.04
+            node_arch: x64
+          - target: linux-arm64
+            os: ubuntu-22.04-arm
+            node_arch: arm64
+          - target: darwin-x64
+            os: macos-26
+            node_arch: x64
+          - target: darwin-arm64
+            os: macos-26
+            node_arch: arm64
 
     runs-on: ${{ matrix.os }}
 
@@ -27,16 +50,35 @@ jobs:
         uses: actions/setup-node@v6
         with:
           node-version: 24.13.0
+          architecture: ${{ matrix.node_arch }}
           cache: 'npm'
+
+      - name: Print Native Target
+        run: |
+          echo "runner=$(uname -s)-$(uname -m)"
+          node -p "'node=' + process.version + ' platform=' + process.platform + ' arch=' + process.arch"
+          npm config get arch
 
       - name: Install Modules
         run: npm ci
 
       - name: Audio Device
+        if: matrix.target == 'linux-x64' || matrix.target == 'linux-arm64'
         uses: LABSN/sound-ci-helpers@v1
 
-      - name: Run Unit Tests
-        if: matrix.os == 'ubuntu-latest'
+      - name: Build Distribution
+        run: npm run build:ci
+
+      - name: Run Unit Tests - Linux
+        if: matrix.target == 'linux-x64' || matrix.target == 'linux-arm64'
         run: |
           export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$GITHUB_WORKSPACE/ci
           xvfb-run --auto-servernum npm run test:ci
+
+      - name: Run Unit Tests - Windows
+        if: matrix.target == 'windows-x64' || matrix.target == 'windows-arm64'
+        run: npm run test:ci
+
+      - name: Run Unit Tests - Mac
+        if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
+        run: npm run test:ci
