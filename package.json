@@ -47,8 +47,8 @@
 		"@node-3d/webaudio": "~6.0.0"
 	},
 	"devDependencies": {
-		"@node-3d/addon-tools": "10.0.1",
-		"@node-3d/core": "6.0.0",
+		"@node-3d/addon-tools": "10.0.5",
+		"@node-3d/core": "6.3.0",
 		"@rslib/core": "0.23.2",
 		"@types/node": "24.13.2",
 		"@types/three": "0.174.0",
