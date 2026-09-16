@@ -131,6 +131,9 @@ audioLoader.load(`${cwd}/sounds/hit.wav`, (buffer: AudioBuffer) => {
 const animate = (time: number) => {
 	for (let i = 0; i < balls.length; i++) {
 		const ball = balls[i];
+		if (!ball) {
+			continue;
+		}
 		const previousHeight = ball.mesh.position.y;
 
 		const angle = i * offset + time * speed;

@@ -25,9 +25,9 @@ const bootstrapHeadlessGlfw = async (): Promise<void> => {
 	}
 
 	const nodeGlobal = globalThis as Record<string, unknown>;
-	nodeGlobal['__isGlfwInited'] = true;
+	nodeGlobal.__isGlfwInited = true;
 	const { glfw: glfwRaw } = await import('@node-3d/glfw');
-	const glfw = glfwRaw as TGlfw;
+	const glfw = glfwRaw;
 	glfw.initHint(glfw.PLATFORM, glfw.PLATFORM_NULL);
 
 	if (!glfw.init()) {
@@ -35,7 +35,7 @@ const bootstrapHeadlessGlfw = async (): Promise<void> => {
 	}
 
 	glfw.defaultWindowHints();
-	nodeGlobal['__isGlfwInited'] = true;
+	nodeGlobal.__isGlfwInited = true;
 };
 
 await bootstrapHeadlessGlfw();
