@@ -25,9 +25,7 @@
 	"files": [
 		"dist",
 		"LICENSE",
-		"package.json",
 		"README.md",
-		"tsconfig.json",
 		"tsconfig.build.json"
 	],
 	"type": "module",
@@ -43,6 +41,7 @@
 		"access": "public"
 	},
 	"scripts": {
+		"i": "npm install --workspaces=false",
 		"test:watch": "node --test --watch \"test/**/*.test.ts\"",
 		"test:ci": "node --test \"test/**/*.test.ts\"",
 		"lint:oxlint": "oxlint .",
