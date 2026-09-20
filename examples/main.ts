@@ -12,7 +12,7 @@ const { doc, loop } = init({
 	autoFullscreen: true,
 });
 
-addThreeHelpers(three);
+addThreeHelpers();
 
 initWebaudio({ window: doc });
 
@@ -47,7 +47,7 @@ camera.position.set(0, 3, 7);
 const controls = new OrbitControls(camera, doc as typeof doc & HTMLElement);
 controls.update();
 
-const screen = new Screen({ three, camera });
+const screen = new Screen({ camera });
 const scene = screen.scene;
 scene.background = new three.Color(0x8dcede);
 
