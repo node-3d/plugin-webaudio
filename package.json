@@ -42,6 +42,7 @@
 	},
 	"scripts": {
 		"i": "npm install --workspaces=false",
+		"example": "cd examples && node main.ts",
 		"test:watch": "node --test --watch \"test/**/*.test.ts\"",
 		"test:ci": "node --test \"test/**/*.test.ts\"",
 		"lint:oxlint": "oxlint .",
