@@ -55,11 +55,11 @@
 		"format:ts:ci": "oxfmt -c ./oxfmt.config.ts --check --no-error-on-unmatched-pattern \"**/*.{js,jsx,ts,tsx}\""
 	},
 	"dependencies": {
-		"@node-3d/webaudio": "~6.0.0"
+		"@node-3d/webaudio": "~6.0.1"
 	},
 	"devDependencies": {
 		"@node-3d/addon-tools": "~10.1.0",
-		"@node-3d/core": "~6.3.0",
+		"@node-3d/core": "~6.4.0",
 		"@rslib/core": "1.0.0",
 		"@types/node": "24.13.2",
 		"@types/three": "0.186.0",
