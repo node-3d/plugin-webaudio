@@ -12,11 +12,26 @@ on:
       - master
 
 jobs:
+  package:
+    name: Pack npm Candidate
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.13.0
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Store npm Candidate
+        uses: node-3d/addon-tools/actions/npm-candidate-upload@1073c0a6403f6c20df2135f03950a568e865aa16
+
   unit-tests:
     name: Unit Tests (${{ matrix.target }})
     strategy:
       fail-fast: false
-      matrix:
+      matrix: &consumer-matrix
         include:
           - target: windows-x64
             os: windows-2022
@@ -99,3 +114,49 @@ jobs:
       - name: Run Unit Tests - Mac
         if: matrix.target == 'darwin-x64' || matrix.target == 'darwin-arm64'
         run: npm run test:ci
+
+  consumer-tests:
+    name: Packed Consumer (${{ matrix.target }})
+    needs: [package, unit-tests]
+    strategy:
+      fail-fast: false
+      matrix: *consumer-matrix
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24.13.0
+          architecture: ${{ matrix.node_arch }}
+      - name: Install Mesa Surfaceless EGL - Mac
+        if: startsWith(matrix.target, 'darwin-')
+        run: bash .github/scripts/setup-macos-gl.sh ${{ matrix.node_arch }}
+      - name: Install OpenGL Compatibility Pack - Windows ARM
+        shell: pwsh
+        if: matrix.target == 'windows-arm64'
+        run: |
+          $url = "https://github.com/microsoft/OpenCLOn12/releases/download/v1.2404.1.0/Universal_D3DMappingLayers_1.2404.1.0_arm64.appx"
+          $file = "d3d-mapping-layers-arm64.appx"
+          Invoke-WebRequest -Uri $url -OutFile $file
+          Add-AppxPackage -Path $file
+      - uses: ssciwr/setup-mesa-dist-win@v3
+        if: matrix.target == 'windows-x64'
+      - name: Audio Device - Linux
+        if: startsWith(matrix.target, 'linux-')
+        uses: LABSN/sound-ci-helpers@v1
+      - name: Install Packed Consumer Candidate
+        id: consumer
+        uses: node-3d/addon-tools/actions/consumer-install@1073c0a6403f6c20df2135f03950a568e865aa16
+        with:
+          package-name: '@node-3d/plugin-webaudio'
+          fixture: test-consumer
+      - name: Run Packed Consumer Tests - Linux
+        if: startsWith(matrix.target, 'linux-')
+        working-directory: ${{ steps.consumer.outputs.directory }}
+        run: xvfb-run --auto-servernum npm test
+      - name: Run Packed Consumer Tests - Windows and macOS
+        if: startsWith(matrix.target, 'windows-') || startsWith(matrix.target, 'darwin-')
+        working-directory: ${{ steps.consumer.outputs.directory }}
+        run: npm test

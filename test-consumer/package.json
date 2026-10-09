@@ -1,0 +1,11 @@
+{
+	"name": "plugin-webaudio-consumer-test",
+	"private": true,
+	"type": "module",
+	"scripts": {
+		"test": "node --test \"*.test.ts\""
+	},
+	"dependencies": {
+		"@node-3d/core": "6.4.1"
+	}
+}
